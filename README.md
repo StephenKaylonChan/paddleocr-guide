@@ -43,11 +43,23 @@
 
 | 功能 | 描述 | 示例 |
 |------|------|------|
+| **基础示例** | | |
 | 基础 OCR | 图片文字识别 | [01_simple_ocr.py](examples/basic/01_simple_ocr.py) |
 | 批量处理 | 多图片批量识别 | [02_batch_ocr.py](examples/basic/02_batch_ocr.py) |
 | 多语言 | 中英日韩等语言 | [03_multilingual.py](examples/basic/03_multilingual.py) |
+| **文档处理** | | |
 | 表格识别 | 识别并导出表格 | [02_table_recognition.py](examples/document/02_table_recognition.py) |
 | PDF 转换 | PDF 转 Markdown | [01_pdf_to_markdown.py](examples/document/01_pdf_to_markdown.py) |
+| 版面分析 | 文档结构分析 | [03_layout_analysis.py](examples/document/03_layout_analysis.py) |
+| **高级功能** | | |
+| 印章识别 | 公章/印章检测提取 | [01_seal_recognition.py](examples/advanced/01_seal_recognition.py) |
+| 公式识别 | 数学公式转 LaTeX | [02_formula_recognition.py](examples/advanced/02_formula_recognition.py) |
+| 图表识别 | 图表内容理解 | [03_chart_recognition.py](examples/advanced/03_chart_recognition.py) |
+| 智能抽取 | 票据/证件信息提取 | [04_chatocr_extraction.py](examples/advanced/04_chatocr_extraction.py) |
+| 手写识别 | 手写文字识别 | [05_handwriting_ocr.py](examples/advanced/05_handwriting_ocr.py) |
+| 竖排文字 | 竖排/纵向文字 | [06_vertical_text.py](examples/advanced/06_vertical_text.py) |
+| 文档预处理 | 方向/弯曲矫正 | [07_doc_preprocessing.py](examples/advanced/07_doc_preprocessing.py) |
+| 视觉语言 | VL 模型 (非ARM) | [08_paddleocr_vl.py](examples/advanced/08_paddleocr_vl.py) |
 
 ---
 
@@ -80,15 +92,16 @@ python -c "from paddleocr import PaddleOCR; print('安装成功')"
 from paddleocr import PaddleOCR
 
 # 初始化（首次运行会自动下载模型）
-ocr = PaddleOCR(use_angle_cls=True, lang='ch')
+ocr = PaddleOCR(lang='ch')
 
-# 识别图片
-result = ocr.ocr('your_image.png', cls=True)
+# 识别图片 (PaddleOCR 3.x API)
+result = ocr.predict('your_image.png')
 
 # 输出结果
-for line in result[0]:
-    text, confidence = line[1]
-    print(f"文本: {text}, 置信度: {confidence:.2%}")
+for res in result:
+    res.print()  # 直接打印结果
+    # 或获取 JSON 格式
+    # print(res.json)
 ```
 
 ---
@@ -126,44 +139,44 @@ PaddleOCR 3.0 提供四大核心模型：
 
 ## 使用示例
 
-### 基础 OCR
+### 基础 OCR (PaddleOCR 3.x)
 
 ```python
 from paddleocr import PaddleOCR
 
-ocr = PaddleOCR(use_angle_cls=True, lang='ch')
-result = ocr.ocr('image.png', cls=True)
+ocr = PaddleOCR(lang='ch')
+result = ocr.predict('image.png')
 
-for line in result[0]:
-    print(f"文本: {line[1][0]}")
+for res in result:
+    res.print()
 ```
 
-### 表格识别
+### 表格识别 (PPStructureV3)
 
 ```python
-from paddleocr import PPStructure
+from paddleocr import PPStructureV3
 
-structure = PPStructure(recovery=True, return_ocr_result_in_table=True)
-result = structure('table.png')
+pipeline = PPStructureV3(use_table_recognition=True)
+result = pipeline.predict(input='table.png')
 
-for item in result:
-    if item['type'] == 'table':
-        print(item['res']['html'])  # HTML 格式表格
+for res in result:
+    res.print()
+    res.save_to_markdown(save_path='output/')
 ```
 
-### 批量处理
+### 智能信息抽取 (PPChatOCRv4Doc)
 
 ```python
-from pathlib import Path
-from paddleocr import PaddleOCR
+from paddleocr import PPChatOCRv4Doc
 
-ocr = PaddleOCR(use_angle_cls=True, lang='ch', show_log=False)
+chat_ocr = PPChatOCRv4Doc(use_seal_recognition=True)
+result = chat_ocr.predict(
+    input='invoice.png',
+    prompt='提取发票号码、金额、日期'
+)
 
-for img_path in Path('images/').glob('*.png'):
-    result = ocr.ocr(str(img_path), cls=True)
-    print(f"\n{img_path.name}:")
-    for line in result[0]:
-        print(f"  {line[1][0]}")
+for res in result:
+    res.print()
 ```
 
 📖 更多示例：[examples/](examples/)

@@ -1,8 +1,8 @@
 # 项目上下文（AI 快速恢复）
 
 **最后更新**: 2025-12-31
-**项目阶段**: Beta (0.1.0)
-**当前状态**: 初始开发
+**项目阶段**: Beta (0.2.0)
+**当前状态**: 功能完整
 
 ---
 
@@ -36,14 +36,19 @@
 ### ✅ 已完成
 - 项目初始化（pyproject.toml, .gitignore, LICENSE）
 - 中英文 README
-- 6 个示例代码（examples/basic/, examples/document/）
+- **14 个示例代码**：
+  - basic/ (3个): 基础 OCR、批量处理、多语言
+  - document/ (3个): PDF 转换、表格识别、版面分析
+  - advanced/ (8个): 印章、公式、图表、智能抽取、手写、竖排、预处理、VL
 - 中文文档（docs/zh/）
 - GitHub 仓库
+- **PaddleOCR 3.x API 全面适配**
+- **四大核心模块 100% 覆盖**
 
 ### 📋 待开发
-- 高级示例（advanced/）
 - 单元测试
 - CI/CD 配置
+- 英文文档同步
 
 ---
 
@@ -51,14 +56,19 @@
 
 ```
 paddleocr-guide/
-├── examples/           # 示例代码
-│   ├── basic/          # 基础 OCR（3 个）
-│   └── document/       # 文档处理（3 个）
+├── examples/               # 示例代码 (14个)
+│   ├── basic/              # 基础 OCR（3 个）- PP-OCRv5
+│   ├── document/           # 文档处理（3 个）- PP-StructureV3
+│   └── advanced/           # 高级示例（8 个）
+│       ├── 01-03           # PP-StructureV3 子功能
+│       ├── 04              # PP-ChatOCRv4Doc
+│       ├── 05-07           # PP-OCRv5 高级用法
+│       └── 08              # PaddleOCR-VL (非ARM)
 ├── docs/
-│   ├── ai-context/     # AI 记忆层
-│   ├── development/    # 开发文档
-│   └── zh/             # 用户文档
-└── assets/             # 资源文件
+│   ├── ai-context/         # AI 记忆层
+│   ├── development/        # 开发文档
+│   └── zh/                 # 用户文档
+└── assets/                 # 资源文件
 ```
 
 ---

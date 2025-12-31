@@ -8,16 +8,23 @@
 
 ```
 examples/
-├── basic/                    # 基础示例
-│   ├── 01_simple_ocr.py      # 单图片 OCR
-│   ├── 02_batch_ocr.py       # 批量处理
-│   └── 03_multilingual.py    # 多语言识别
-├── document/                 # 文档处理
-│   ├── 01_pdf_to_markdown.py # PDF 转 Markdown
-│   ├── 02_table_recognition.py # 表格识别
-│   └── 03_layout_analysis.py # 版面分析
-└── advanced/                 # 高级示例
-    └── (待添加)
+├── basic/                         # 基础示例 (PP-OCRv5)
+│   ├── 01_simple_ocr.py           # 单图片 OCR
+│   ├── 02_batch_ocr.py            # 批量处理
+│   └── 03_multilingual.py         # 多语言识别
+├── document/                      # 文档处理 (PP-StructureV3)
+│   ├── 01_pdf_to_markdown.py      # PDF 转 Markdown
+│   ├── 02_table_recognition.py    # 表格识别
+│   └── 03_layout_analysis.py      # 版面分析
+└── advanced/                      # 高级示例
+    ├── 01_seal_recognition.py     # 印章识别 (PP-StructureV3)
+    ├── 02_formula_recognition.py  # 公式识别 (PP-StructureV3)
+    ├── 03_chart_recognition.py    # 图表识别 (PP-StructureV3)
+    ├── 04_chatocr_extraction.py   # 智能抽取 (PP-ChatOCRv4Doc)
+    ├── 05_handwriting_ocr.py      # 手写识别 (PP-OCRv5)
+    ├── 06_vertical_text.py        # 竖排文字 (PP-OCRv5)
+    ├── 07_doc_preprocessing.py    # 文档预处理 (PP-StructureV3)
+    └── 08_paddleocr_vl.py         # 视觉语言 (PaddleOCR-VL)
 ```
 
 ---
@@ -143,6 +150,163 @@ python examples/document/03_layout_analysis.py
 - 识别标题、正文、表格、图片等
 - 分析文档层次结构
 - 输出版面分析报告
+
+---
+
+## 高级示例 (advanced/)
+
+### 01_seal_recognition.py - 印章识别
+
+**用途**: 识别文档中的公章、印章
+
+**适用模型**: PP-StructureV3
+
+**运行**:
+
+```bash
+python examples/advanced/01_seal_recognition.py
+```
+
+**主要功能**:
+- 检测文档中的印章区域
+- 提取印章中的文字
+- 支持圆形、椭圆形印章
+
+---
+
+### 02_formula_recognition.py - 公式识别
+
+**用途**: 识别数学公式并转换为 LaTeX
+
+**适用模型**: PP-StructureV3
+
+**运行**:
+
+```bash
+python examples/advanced/02_formula_recognition.py
+```
+
+**主要功能**:
+- 检测公式区域
+- 转换为 LaTeX 格式
+- 支持行内和行间公式
+
+---
+
+### 03_chart_recognition.py - 图表识别
+
+**用途**: 理解图表内容
+
+**适用模型**: PP-StructureV3
+
+**运行**:
+
+```bash
+python examples/advanced/03_chart_recognition.py
+```
+
+**主要功能**:
+- 检测柱状图、折线图、饼图等
+- 提取图表数据
+- 理解图表含义
+
+---
+
+### 04_chatocr_extraction.py - 智能信息抽取
+
+**用途**: 从票据、证件中提取结构化信息
+
+**适用模型**: PP-ChatOCRv4Doc (离线模式)
+
+**运行**:
+
+```bash
+python examples/advanced/04_chatocr_extraction.py
+```
+
+**主要功能**:
+- 发票信息提取
+- 身份证信息提取
+- 合同信息提取
+- 自定义 prompt 抽取
+
+---
+
+### 05_handwriting_ocr.py - 手写识别
+
+**用途**: 识别手写文字
+
+**适用模型**: PP-OCRv5
+
+**运行**:
+
+```bash
+python examples/advanced/05_handwriting_ocr.py
+```
+
+**主要功能**:
+- 识别潦草手写
+- 处理倾斜文字
+- 置信度过滤
+
+---
+
+### 06_vertical_text.py - 竖排文字
+
+**用途**: 识别竖排/纵向排列的文字
+
+**适用模型**: PP-OCRv5
+
+**运行**:
+
+```bash
+python examples/advanced/06_vertical_text.py
+```
+
+**主要功能**:
+- 中文竖排书籍识别
+- 日文竖排文档
+- 繁体中文支持
+
+---
+
+### 07_doc_preprocessing.py - 文档预处理
+
+**用途**: 文档方向矫正、弯曲矫正
+
+**适用模型**: PP-StructureV3
+
+**运行**:
+
+```bash
+python examples/advanced/07_doc_preprocessing.py
+```
+
+**主要功能**:
+- 文档方向检测与矫正 (0°/90°/180°/270°)
+- 弯曲文档矫正
+- 透视变形修复
+
+---
+
+### 08_paddleocr_vl.py - 视觉语言模型
+
+**用途**: 使用 VL 模型进行复杂文档理解
+
+**适用模型**: PaddleOCR-VL
+
+> ⚠️ **注意**: 不支持 macOS ARM (M1/M2/M3/M4)
+
+**运行**:
+
+```bash
+python examples/advanced/08_paddleocr_vl.py
+```
+
+**主要功能**:
+- 109 种语言支持
+- 复杂文档理解
+- 图表、公式、表格综合识别
 
 ---
 
