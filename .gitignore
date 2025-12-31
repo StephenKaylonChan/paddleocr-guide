@@ -60,5 +60,6 @@ Thumbs.db
 .coverage
 htmlcov/
 
-# Claude
-.claude/
+# Claude (keep commands/ for shared slash commands)
+.claude/*
+!.claude/commands/
