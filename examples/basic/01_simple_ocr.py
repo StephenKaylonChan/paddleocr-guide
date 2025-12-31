@@ -5,81 +5,84 @@ Basic OCR Example - Single Image Text Recognition
 
 适用模型: PP-OCRv5
 支持系统: macOS / Linux / Windows
+API 版本: PaddleOCR 3.x
 """
 
 from paddleocr import PaddleOCR
 from pathlib import Path
 
 
-def simple_ocr(image_path: str, lang: str = 'ch') -> list:
+def simple_ocr(image_path: str, lang: str = 'ch'):
     """
-    执行基础 OCR 识别
+    执行基础 OCR 识别 (PaddleOCR 3.x API)
 
     Args:
         image_path: 图片路径
         lang: 语言代码 ('ch', 'en', 'japan', 'korean', etc.)
 
     Returns:
-        识别结果列表
+        结果对象迭代器
     """
     # 初始化 OCR 引擎
-    # use_angle_cls: 启用方向分类（处理倾斜文字）
-    # lang: 语言设置，'ch' 同时支持中英文
+    # use_doc_orientation_classify: 文档方向分类
+    # use_doc_unwarping: 文档弯曲矫正
+    # use_textline_orientation: 文本行方向分类
     ocr = PaddleOCR(
-        use_angle_cls=True,
         lang=lang,
-        show_log=False  # 关闭详细日志
+        use_doc_orientation_classify=False,
+        use_doc_unwarping=False,
+        use_textline_orientation=False
     )
 
-    # 执行识别
-    result = ocr.ocr(image_path, cls=True)
+    # 执行识别 (PaddleOCR 3.x 使用 predict 方法)
+    result = ocr.predict(image_path)
 
-    return result[0] if result and result[0] else []
+    return result
 
 
-def format_result(ocr_result: list) -> None:
+def format_result(result) -> None:
     """格式化输出识别结果"""
-    if not ocr_result:
-        print("未检测到文字")
-        return
-
-    print(f"共检测到 {len(ocr_result)} 行文字:\n")
-    print("-" * 50)
-
-    for idx, line in enumerate(ocr_result, 1):
-        box, (text, confidence) = line[0], line[1]
-        print(f"[{idx}] {text}")
-        print(f"    置信度: {confidence:.2%}")
-        # 只显示左上角和右下角坐标
-        print(f"    位置: ({box[0][0]:.0f}, {box[0][1]:.0f}) - ({box[2][0]:.0f}, {box[2][1]:.0f})")
-        print()
+    for res in result:
+        # 使用内置 print 方法输出
+        res.print()
 
 
-def save_result(ocr_result: list, output_path: str) -> None:
-    """保存识别结果到文件"""
-    with open(output_path, 'w', encoding='utf-8') as f:
-        for line in ocr_result:
-            text = line[1][0]
-            confidence = line[1][1]
-            f.write(f"{text}\t{confidence:.4f}\n")
-    print(f"结果已保存到: {output_path}")
+def save_result_json(result, output_dir: str) -> None:
+    """保存识别结果为 JSON"""
+    for res in result:
+        res.save_to_json(output_dir)
+    print(f"JSON 结果已保存到: {output_dir}")
+
+
+def save_result_img(result, output_dir: str) -> None:
+    """保存可视化结果图片"""
+    for res in result:
+        res.save_to_img(output_dir)
+    print(f"可视化图片已保存到: {output_dir}")
 
 
 if __name__ == "__main__":
     # 示例：识别测试图片
     project_root = Path(__file__).parent.parent.parent
     image_path = project_root / "assets" / "test_images" / "test.png"
+    output_dir = project_root / "assets" / "outputs"
 
     if not image_path.exists():
         print(f"测试图片不存在: {image_path}")
         print("请确保 assets/test_images/test.png 文件存在")
         exit(1)
 
+    # 确保输出目录存在
+    output_dir.mkdir(parents=True, exist_ok=True)
+
     print(f"正在识别: {image_path}\n")
 
+    # 执行 OCR
     result = simple_ocr(str(image_path))
+
+    # 输出结果
     format_result(result)
 
     # 可选：保存结果
-    # output_path = project_root / "assets" / "outputs" / "result.txt"
-    # save_result(result, str(output_path))
+    # save_result_json(result, str(output_dir))
+    # save_result_img(result, str(output_dir))

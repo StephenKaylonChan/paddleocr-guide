@@ -5,133 +5,80 @@ Layout Analysis Example
 
 适用模型: PP-StructureV3
 功能: 分析文档版面结构（标题、段落、表格、图片等）
+API 版本: PaddleOCR 3.x
 """
 
-from paddleocr import PPStructure
+from paddleocr import PPStructureV3
 from pathlib import Path
 import json
 
 
-# 版面元素类型
-LAYOUT_TYPES = {
-    'text': '正文',
-    'title': '标题',
-    'table': '表格',
-    'figure': '图片',
-    'list': '列表',
-    'reference': '参考文献',
-    'header': '页眉',
-    'footer': '页脚',
-    'equation': '公式'
-}
-
-
-def analyze_layout(image_path: str) -> list:
+def analyze_layout(image_path: str, output_dir: str = None):
     """
-    分析文档版面
+    分析文档版面 (PaddleOCR 3.x)
 
     Args:
         image_path: 图片路径
+        output_dir: 输出目录
 
     Returns:
-        版面元素列表
+        结果对象列表
     """
-    # 初始化 PP-Structure
-    structure = PPStructure(
-        layout=True,     # 启用版面分析
-        table=True,      # 启用表格识别
-        show_log=False
+    # 初始化 PP-StructureV3（完整版面分析）
+    pipeline = PPStructureV3(
+        use_doc_orientation_classify=True,  # 文档方向分类
+        use_doc_unwarping=False,            # 文档弯曲矫正
+        use_table_recognition=True,         # 表格识别
+        use_formula_recognition=True,       # 公式识别
+        use_seal_recognition=False,         # 印章识别
+        use_chart_recognition=False         # 图表识别
     )
 
-    # 分析
-    result = structure(image_path)
+    # 执行预测
+    output = pipeline.predict(input=image_path)
 
-    # 解析结果
-    elements = []
-    for idx, item in enumerate(result):
-        element = {
-            'index': idx,
-            'type': item.get('type', 'unknown'),
-            'type_name': LAYOUT_TYPES.get(item.get('type'), '未知'),
-            'bbox': item.get('bbox', []),
-        }
+    results = []
+    for res in output:
+        results.append(res)
 
-        # 提取内容
-        res = item.get('res', {})
-        if isinstance(res, dict):
-            if 'text' in res:
-                element['text'] = res['text']
-            if 'html' in res:
-                element['html'] = res['html'][:100] + '...' if len(res.get('html', '')) > 100 else res.get('html', '')
-        elif isinstance(res, str):
-            element['text'] = res
+        # 打印结果
+        res.print()
 
-        elements.append(element)
+        if output_dir:
+            output_path = Path(output_dir)
+            output_path.mkdir(parents=True, exist_ok=True)
 
-    return elements
+            # 保存 Markdown
+            res.save_to_markdown(save_path=str(output_path))
+
+            # 保存 JSON
+            res.save_to_json(save_path=str(output_path))
+
+            # 保存可视化图片
+            res.save_to_img(save_path=str(output_path))
+
+    if output_dir:
+        print(f"\n结果已保存到: {output_dir}")
+
+    return results
 
 
-def visualize_layout(elements: list) -> str:
+def quick_analysis(image_path: str) -> None:
     """
-    生成版面结构的文本可视化
+    快速版面分析（仅输出不保存）
 
     Args:
-        elements: 版面元素列表
-
-    Returns:
-        可视化文本
+        image_path: 图片路径
     """
-    lines = []
-    lines.append("=" * 60)
-    lines.append("文档版面结构")
-    lines.append("=" * 60)
+    pipeline = PPStructureV3()
 
-    # 按类型统计
-    type_counts = {}
-    for elem in elements:
-        t = elem['type_name']
-        type_counts[t] = type_counts.get(t, 0) + 1
+    output = pipeline.predict(input=image_path)
 
-    lines.append("\n【统计】")
-    for t, count in type_counts.items():
-        lines.append(f"  {t}: {count} 个")
+    print("\n版面分析结果:")
+    print("-" * 50)
 
-    lines.append("\n【详细列表】")
-    lines.append("-" * 60)
-
-    for elem in elements:
-        lines.append(f"\n[{elem['index'] + 1}] {elem['type_name']} ({elem['type']})")
-
-        # 位置信息
-        if elem['bbox']:
-            bbox = elem['bbox']
-            lines.append(f"    位置: ({bbox[0]:.0f}, {bbox[1]:.0f}) - ({bbox[2]:.0f}, {bbox[3]:.0f})")
-
-        # 内容预览
-        if 'text' in elem:
-            text = elem['text']
-            preview = text[:50] + '...' if len(text) > 50 else text
-            lines.append(f"    内容: {preview}")
-        elif 'html' in elem:
-            lines.append(f"    内容: [HTML 表格]")
-
-    return '\n'.join(lines)
-
-
-def export_layout_json(elements: list, output_path: str) -> None:
-    """
-    导出版面分析结果为 JSON
-
-    Args:
-        elements: 版面元素列表
-        output_path: 输出路径
-    """
-    with open(output_path, 'w', encoding='utf-8') as f:
-        json.dump({
-            'element_count': len(elements),
-            'elements': elements
-        }, f, ensure_ascii=False, indent=2)
-    print(f"JSON 已保存: {output_path}")
+    for res in output:
+        res.print()
 
 
 def main():
@@ -152,24 +99,12 @@ def main():
 
     print(f"分析文档: {image_path}\n")
 
-    # 分析版面
-    elements = analyze_layout(str(image_path))
+    # 执行版面分析
+    results = analyze_layout(str(image_path), str(output_dir))
 
-    # 可视化
-    visualization = visualize_layout(elements)
-    print(visualization)
-
-    # 保存结果
-    output_path = Path(output_dir)
-    output_path.mkdir(parents=True, exist_ok=True)
-
-    json_file = output_path / f"{image_path.stem}_layout.json"
-    export_layout_json(elements, str(json_file))
-
-    txt_file = output_path / f"{image_path.stem}_layout.txt"
-    with open(txt_file, 'w', encoding='utf-8') as f:
-        f.write(visualization)
-    print(f"TXT 已保存: {txt_file}")
+    print("\n" + "=" * 60)
+    print("分析完成!")
+    print(f"共处理 {len(results)} 页")
 
 
 if __name__ == "__main__":

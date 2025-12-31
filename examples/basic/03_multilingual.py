@@ -5,6 +5,7 @@ Multilingual OCR Example
 
 适用模型: PP-OCRv5
 支持语言: 80+ 种语言
+API 版本: PaddleOCR 3.x
 """
 
 from paddleocr import PaddleOCR
@@ -35,7 +36,7 @@ SUPPORTED_LANGUAGES = {
 
 def create_ocr_engine(lang: str = 'ch') -> PaddleOCR:
     """
-    创建指定语言的 OCR 引擎
+    创建指定语言的 OCR 引擎 (PaddleOCR 3.x)
 
     Args:
         lang: 语言代码
@@ -44,9 +45,10 @@ def create_ocr_engine(lang: str = 'ch') -> PaddleOCR:
         PaddleOCR 实例
     """
     return PaddleOCR(
-        use_angle_cls=True,
         lang=lang,
-        show_log=False
+        use_doc_orientation_classify=False,
+        use_doc_unwarping=False,
+        use_textline_orientation=False
     )
 
 
@@ -59,18 +61,20 @@ def recognize_with_language(image_path: str, lang: str = 'ch') -> list:
         lang: 语言代码
 
     Returns:
-        识别结果
+        识别结果列表
     """
     ocr = create_ocr_engine(lang)
-    result = ocr.ocr(image_path, cls=True)
+    result = ocr.predict(image_path)
 
     texts = []
-    if result and result[0]:
-        for line in result[0]:
-            texts.append({
-                'text': line[1][0],
-                'confidence': line[1][1]
-            })
+    for res in result:
+        res_json = res.json
+        if 'rec_texts' in res_json and 'rec_scores' in res_json:
+            for text, score in zip(res_json['rec_texts'], res_json['rec_scores']):
+                texts.append({
+                    'text': text,
+                    'confidence': score
+                })
 
     return texts
 

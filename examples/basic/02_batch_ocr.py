@@ -5,6 +5,7 @@ Batch OCR Example - Process Multiple Images
 
 适用模型: PP-OCRv5
 支持系统: macOS / Linux / Windows
+API 版本: PaddleOCR 3.x
 """
 
 from paddleocr import PaddleOCR
@@ -14,7 +15,7 @@ from datetime import datetime
 
 
 class BatchOCR:
-    """批量 OCR 处理器"""
+    """批量 OCR 处理器 (PaddleOCR 3.x)"""
 
     def __init__(self, lang: str = 'ch'):
         """
@@ -25,9 +26,10 @@ class BatchOCR:
         """
         # 只初始化一次模型，提高效率
         self.ocr = PaddleOCR(
-            use_angle_cls=True,
             lang=lang,
-            show_log=False
+            use_doc_orientation_classify=False,
+            use_doc_unwarping=False,
+            use_textline_orientation=False
         )
 
     def process_image(self, image_path: str) -> dict:
@@ -40,16 +42,18 @@ class BatchOCR:
         Returns:
             识别结果字典
         """
-        result = self.ocr.ocr(image_path, cls=True)
+        result = self.ocr.predict(image_path)
 
         texts = []
-        if result and result[0]:
-            for line in result[0]:
-                texts.append({
-                    'text': line[1][0],
-                    'confidence': float(line[1][1]),
-                    'box': [[float(p[0]), float(p[1])] for p in line[0]]
-                })
+        for res in result:
+            # 获取 JSON 格式的结果
+            res_json = res.json
+            if 'rec_texts' in res_json and 'rec_scores' in res_json:
+                for text, score in zip(res_json['rec_texts'], res_json['rec_scores']):
+                    texts.append({
+                        'text': text,
+                        'confidence': float(score)
+                    })
 
         return {
             'file': Path(image_path).name,
