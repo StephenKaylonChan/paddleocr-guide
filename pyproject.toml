@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "paddleocr-guide"
+version = "0.1.0"
+description = "PaddleOCR 3.0 实战指南 - 中文 OCR 最佳实践"
+readme = "README_zh.md"
+license = {text = "MIT"}
+requires-python = ">=3.8"
+authors = [
+    {name = "Your Name", email = "your@email.com"}
+]
+keywords = ["ocr", "paddleocr", "chinese-ocr", "document-parsing", "table-recognition"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Image Recognition",
+    "Natural Language :: Chinese (Simplified)",
+]
+
+dependencies = [
+    "paddleocr>=3.0.0",
+    "paddlepaddle>=3.0.0",
+    "Pillow>=9.0.0",
+    "numpy>=1.20.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+]
+all = [
+    "opencv-python>=4.5.0",
+    "pandas>=1.3.0",
+    "openpyxl>=3.0.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/stephenkaylonchan/paddleocr-guide"
+Documentation = "https://github.com/stephenkaylonchan/paddleocr-guide#readme"
+Repository = "https://github.com/stephenkaylonchan/paddleocr-guide.git"
+Issues = "https://github.com/stephenkaylonchan/paddleocr-guide/issues"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests*"]
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311']
+
+[tool.isort]
+profile = "black"
+line_length = 100
