@@ -32,6 +32,37 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 
+# 图片大小限制（像素）
+MAX_IMAGE_PIXELS = 4000 * 4000  # 1600 万像素
+MAX_IMAGE_SIZE_MB = 10  # 10MB
+
+
+def check_image_size(image_path: str) -> tuple[bool, str]:
+    """
+    检查图片大小，防止内存溢出
+
+    Returns:
+        (是否安全, 警告信息)
+    """
+    from PIL import Image
+
+    path = Path(image_path)
+    file_size_mb = path.stat().st_size / 1024 / 1024
+
+    if file_size_mb > MAX_IMAGE_SIZE_MB:
+        return False, f"文件太大: {file_size_mb:.1f}MB (限制: {MAX_IMAGE_SIZE_MB}MB)"
+
+    try:
+        with Image.open(image_path) as img:
+            pixels = img.size[0] * img.size[1]
+            if pixels > MAX_IMAGE_PIXELS:
+                return False, f"图片尺寸太大: {img.size[0]}x{img.size[1]} ({pixels:,} 像素)"
+    except Exception as e:
+        return False, f"无法读取图片: {e}"
+
+    return True, ""
+
+
 def get_ocr(lang: str = "ch"):
     """延迟加载 OCR 实例"""
     try:
@@ -58,7 +89,8 @@ def cli():
 @click.option("--lang", "-l", default="ch", help="语言代码 (默认: ch)")
 @click.option("--output", "-o", type=click.Path(), help="输出文件路径 (可选)")
 @click.option("--json", "as_json", is_flag=True, help="输出 JSON 格式")
-def scan(image: str, lang: str, output: Optional[str], as_json: bool):
+@click.option("--force", "-f", is_flag=True, help="强制处理大图片 (可能导致内存溢出)")
+def scan(image: str, lang: str, output: Optional[str], as_json: bool, force: bool):
     """
     识别单张图片
 
@@ -69,6 +101,16 @@ def scan(image: str, lang: str, output: Optional[str], as_json: bool):
         paddleocr-guide scan photo.png --json
     """
     import json as json_lib
+
+    # 检查图片大小
+    is_safe, warning = check_image_size(image)
+    if not is_safe:
+        if force:
+            click.echo(f"警告: {warning}，强制继续...", err=True)
+        else:
+            click.echo(f"错误: {warning}", err=True)
+            click.echo("提示: 使用 --force 强制处理，但可能导致内存溢出", err=True)
+            sys.exit(1)
 
     click.echo(f"正在识别: {image}")
 
