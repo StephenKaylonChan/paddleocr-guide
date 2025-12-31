@@ -18,21 +18,37 @@
 pip install paddleocr
 
 # 开发依赖
-pip install black isort pytest
+pip install -e ".[dev]"
+
+# 或手动安装
+pip install black isort pytest mypy flake8 bandit
 ```
 
 ---
 
 ## 代码风格
 
+### Pre-commit (推荐)
+
+```bash
+# 安装 pre-commit
+pip install pre-commit
+
+# 激活 hooks
+pre-commit install
+
+# 手动运行所有检查
+pre-commit run --all-files
+```
+
 ### 格式化工具
 
 ```bash
 # 格式化代码
-black examples/ --line-length 100
+black examples/ paddleocr_guide/ tests/ --line-length 100
 
 # 排序导入
-isort examples/
+isort examples/ paddleocr_guide/ tests/
 ```
 
 ### 检查（不修改）
@@ -40,6 +56,8 @@ isort examples/
 ```bash
 black examples/ --check
 isort examples/ --check
+flake8 examples/
+mypy examples/
 ```
 
 ### 配置
@@ -49,11 +67,47 @@ isort examples/ --check
 ```toml
 [tool.black]
 line-length = 100
-target-version = ['py38', 'py39', 'py310', 'py311']
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
 
 [tool.isort]
 profile = "black"
 line_length = 100
+```
+
+---
+
+## CLI 工具开发
+
+### 目录结构
+
+```
+paddleocr_guide/
+├── __init__.py      # 版本信息
+└── cli.py           # 命令行入口
+```
+
+### 添加新命令
+
+```python
+# 在 cli.py 中添加
+@cli.command()
+@click.argument("input")
+@click.option("--output", "-o", help="输出路径")
+def new_command(input: str, output: str):
+    """命令说明"""
+    # 实现逻辑
+    pass
+```
+
+### 测试命令
+
+```bash
+# 安装开发模式
+pip install -e .
+
+# 测试命令
+paddleocr-guide --help
+paddleocr-guide new_command input.png
 ```
 
 ---
@@ -89,6 +143,34 @@ docs: update macOS troubleshooting
 
 ---
 
+## 测试
+
+### 运行测试
+
+```bash
+# 运行所有测试
+pytest tests/ -v
+
+# 运行特定测试
+pytest tests/test_common.py -v
+
+# 生成覆盖率报告
+pytest tests/ --cov=examples --cov-report=html
+```
+
+### 测试结构
+
+```
+tests/
+├── conftest.py        # pytest fixtures
+├── test_common.py     # 公共模块测试 (27个用例)
+└── test_basic_ocr.py  # OCR 测试 (15个用例，已跳过)
+```
+
+> ⚠️ **注意**: OCR 相关测试已跳过，因为 PaddleOCR 3.x 存在内存问题
+
+---
+
 ## 文档规范
 
 ### 语言
@@ -102,26 +184,6 @@ docs: update macOS troubleshooting
 - 使用中文标点
 - 代码块标明语言
 - 表格对齐
-
----
-
-## 测试
-
-### 运行示例
-
-```bash
-# 运行单个示例
-python examples/basic/01_simple_ocr.py
-
-# 确保测试图片存在
-ls assets/test_images/
-```
-
-### 单元测试（待实现）
-
-```bash
-pytest tests/
-```
 
 ---
 
@@ -145,9 +207,39 @@ pytest tests/
 
 ---
 
+## CI/CD
+
+### GitHub Actions
+
+```yaml
+# .github/workflows/ci.yml
+- lint: black, isort, flake8
+- type-check: mypy
+- test: pytest (Ubuntu/macOS, Python 3.8-3.12)
+- security: bandit
+```
+
+### 本地运行 CI 检查
+
+```bash
+# 格式检查
+black --check .
+isort --check .
+
+# 类型检查
+mypy examples/
+
+# 安全检查
+bandit -r examples/ -ll
+```
+
+---
+
 ## 发布流程
 
-1. 更新版本号（pyproject.toml）
-2. 更新 CHANGELOG
-3. 创建 Git tag
-4. 推送到 GitHub
+1. 更新版本号（pyproject.toml, paddleocr_guide/__init__.py）
+2. 更新 CHANGELOG.md
+3. 运行测试: `pytest tests/`
+4. 格式化代码: `pre-commit run --all-files`
+5. 创建 Git tag: `git tag v0.2.1`
+6. 推送到 GitHub: `git push && git push --tags`

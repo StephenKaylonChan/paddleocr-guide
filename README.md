@@ -20,6 +20,7 @@
 - [项目简介](#项目简介)
 - [功能特性](#功能特性)
 - [快速开始](#快速开始)
+- [CLI 命令行工具](#cli-命令行工具)
 - [模型选择指南](#模型选择指南)
 - [使用示例](#使用示例)
 - [macOS 用户须知](#macos-用户须知)
@@ -111,6 +112,45 @@ for res in result:
 
 ---
 
+## CLI 命令行工具
+
+安装后可直接在终端使用，无需编写代码：
+
+```bash
+# 安装
+pip install -e .
+
+# 查看帮助
+paddleocr-guide --help
+```
+
+### 可用命令
+
+| 命令 | 功能 | 示例 |
+|------|------|------|
+| `scan` | 识别单张图片 | `paddleocr-guide scan photo.png` |
+| `batch` | 批量处理目录 | `paddleocr-guide batch ./images/` |
+| `pdf` | PDF 转 Markdown | `paddleocr-guide pdf doc.pdf -o out.md` |
+| `langs` | 查看支持的语言 | `paddleocr-guide langs` |
+| `info` | 查看环境信息 | `paddleocr-guide info` |
+
+### 常用选项
+
+```bash
+# 指定语言
+paddleocr-guide scan image.png --lang en
+
+# 输出到文件
+paddleocr-guide scan image.png -o result.txt
+
+# 输出 JSON 格式
+paddleocr-guide scan image.png --json
+```
+
+> **注意**: CLI 内置图片大小检查，超过 10MB 或 1600 万像素的图片会被拒绝，使用 `--force` 强制处理。
+
+---
+
 ## 模型选择指南
 
 PaddleOCR 3.0 提供四大核心模型：
@@ -198,6 +238,23 @@ for res in result:
 
 如果你使用的是 M 系列芯片的 Mac，请使用 **PP-OCRv5** 替代。
 
+### 已知问题：内存占用过高
+
+> ⚠️ **PaddleOCR 3.x 在 macOS ARM 上可能占用大量内存（40GB+），可能导致系统卡死**
+
+**临时解决方案**：
+```python
+# 禁用预处理模型减少内存占用
+ocr = PaddleOCR(
+    lang='ch',
+    use_doc_orientation_classify=False,
+    use_doc_unwarping=False,
+    use_textline_orientation=False,
+)
+```
+
+详见 [常见问题解决](docs/zh/troubleshooting.md#q5-内存不足-oom--系统卡死)
+
 ### 推荐方案
 
 | 场景 | 推荐模型 | 说明 |
@@ -259,24 +316,28 @@ A: `lang='ch'` 默认支持中英文混合。纯英文可用 `lang='en'`。
 
 ```
 paddleocr-guide/
+├── paddleocr_guide/         # CLI 命令行工具
+│   ├── __init__.py
+│   └── cli.py               # 命令行入口
+├── examples/                # 示例代码 (16个)
+│   ├── _common/             # 公共模块 (异常、日志、工具)
+│   ├── basic/               # 基础示例 (3个)
+│   ├── document/            # 文档处理 (3个)
+│   └── advanced/            # 高级用法 (10个)
+├── tests/                   # 测试代码
+│   ├── conftest.py          # pytest fixtures
+│   ├── test_common.py       # 公共模块测试
+│   └── test_basic_ocr.py    # OCR 测试
 ├── docs/                    # 文档
 │   ├── zh/                  # 中文文档
-│   │   ├── installation.md  # 安装指南
-│   │   ├── model_comparison.md  # 模型对比
-│   │   └── troubleshooting.md   # 常见问题
-│   └── en/                  # 英文文档
-├── examples/                # 示例代码
-│   ├── basic/               # 基础示例
-│   ├── document/            # 文档处理
-│   └── advanced/            # 高级用法
+│   ├── en/                  # 英文文档
+│   ├── ai-context/          # AI 协作上下文
+│   └── development/         # 开发文档
+├── .github/workflows/       # CI/CD 配置
 ├── assets/                  # 资源文件
-│   ├── test_images/         # 测试图片
-│   └── outputs/             # 输出目录
-├── scripts/                 # 脚本工具
-├── README.md                # 英文 README
-├── README_zh.md             # 中文 README（本文件）
-├── requirements.txt         # 依赖
-└── LICENSE                  # 许可证
+├── pyproject.toml           # 项目配置
+├── CHANGELOG.md             # 变更日志
+└── CONTRIBUTING.md          # 贡献指南
 ```
 
 ---

@@ -2,9 +2,12 @@
 
 > A Chinese OCR solution based on PaddleOCR 3.0, optimized for macOS users
 
+[![CI](https://github.com/StephenKaylonChan/paddleocr-guide/actions/workflows/ci.yml/badge.svg)](https://github.com/StephenKaylonChan/paddleocr-guide/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 [![PaddleOCR](https://img.shields.io/badge/PaddleOCR-3.x-green.svg)](https://github.com/PaddlePaddle/PaddleOCR)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 **English** | [中文](README.md)
 
@@ -17,6 +20,7 @@
 - [Introduction](#introduction)
 - [Features](#features)
 - [Quick Start](#quick-start)
+- [CLI Tool](#cli-tool)
 - [Model Selection Guide](#model-selection-guide)
 - [Examples](#examples)
 - [macOS Users Guide](#macos-users-guide)
@@ -80,16 +84,43 @@ python -c "from paddleocr import PaddleOCR; print('Installation successful')"
 from paddleocr import PaddleOCR
 
 # Initialize (models will be downloaded automatically on first run)
-ocr = PaddleOCR(use_angle_cls=True, lang='ch')
+ocr = PaddleOCR(lang='ch')
 
-# Recognize image
-result = ocr.ocr('your_image.png', cls=True)
+# Recognize image (PaddleOCR 3.x API)
+result = ocr.predict('your_image.png')
 
 # Output results
-for line in result[0]:
-    text, confidence = line[1]
-    print(f"Text: {text}, Confidence: {confidence:.2%}")
+for res in result:
+    res.print()  # Print results directly
+    # Or get JSON format
+    # print(res.json)
 ```
+
+---
+
+## CLI Tool
+
+Use directly in terminal after installation, no coding required:
+
+```bash
+# Install
+pip install -e .
+
+# View help
+paddleocr-guide --help
+```
+
+### Available Commands
+
+| Command | Function | Example |
+|---------|----------|---------|
+| `scan` | Recognize single image | `paddleocr-guide scan photo.png` |
+| `batch` | Batch process directory | `paddleocr-guide batch ./images/` |
+| `pdf` | PDF to Markdown | `paddleocr-guide pdf doc.pdf -o out.md` |
+| `langs` | List supported languages | `paddleocr-guide langs` |
+| `info` | Show environment info | `paddleocr-guide info` |
+
+> **Note**: CLI has built-in image size check. Images over 10MB or 16 million pixels will be rejected. Use `--force` to override.
 
 ---
 
@@ -124,29 +155,29 @@ What's your use case?
 
 ## Examples
 
-### Basic OCR
+### Basic OCR (PaddleOCR 3.x)
 
 ```python
 from paddleocr import PaddleOCR
 
-ocr = PaddleOCR(use_angle_cls=True, lang='ch')
-result = ocr.ocr('image.png', cls=True)
+ocr = PaddleOCR(lang='ch')
+result = ocr.predict('image.png')
 
-for line in result[0]:
-    print(f"Text: {line[1][0]}")
+for res in result:
+    res.print()
 ```
 
-### Table Recognition
+### Table Recognition (PPStructureV3)
 
 ```python
-from paddleocr import PPStructure
+from paddleocr import PPStructureV3
 
-structure = PPStructure(recovery=True, return_ocr_result_in_table=True)
-result = structure('table.png')
+pipeline = PPStructureV3(use_table_recognition=True)
+result = pipeline.predict(input='table.png')
 
-for item in result:
-    if item['type'] == 'table':
-        print(item['res']['html'])  # HTML format table
+for res in result:
+    res.print()
+    res.save_to_markdown(save_path='output/')
 ```
 
 More examples: [examples/](examples/)
@@ -160,6 +191,23 @@ More examples: [examples/](examples/)
 > ⚠️ **PaddleOCR-VL does NOT support Apple Silicon (M1/M2/M3/M4)**
 
 If you're using a Mac with M-series chip, please use **PP-OCRv5** instead.
+
+### Known Issue: High Memory Usage
+
+> ⚠️ **PaddleOCR 3.x may consume excessive memory (40GB+) on macOS ARM, potentially causing system freeze**
+
+**Temporary Solution**:
+```python
+# Disable preprocessing models to reduce memory usage
+ocr = PaddleOCR(
+    lang='ch',
+    use_doc_orientation_classify=False,
+    use_doc_unwarping=False,
+    use_textline_orientation=False,
+)
+```
+
+See [Troubleshooting](docs/en/troubleshooting.md) for details.
 
 ### Recommended Solutions
 
@@ -214,18 +262,28 @@ A: `lang='ch'` supports Chinese-English mixed recognition by default. Use `lang=
 
 ```
 paddleocr-guide/
+├── paddleocr_guide/         # CLI command line tool
+│   ├── __init__.py
+│   └── cli.py               # CLI entry point
+├── examples/                # Example code (16 files)
+│   ├── _common/             # Common modules (exceptions, logging, utils)
+│   ├── basic/               # Basic examples (3)
+│   ├── document/            # Document processing (3)
+│   └── advanced/            # Advanced examples (10)
+├── tests/                   # Test code
+│   ├── conftest.py          # pytest fixtures
+│   ├── test_common.py       # Common module tests
+│   └── test_basic_ocr.py    # OCR tests
 ├── docs/                    # Documentation
-│   └── zh/                  # Chinese docs
-├── examples/                # Example code
-│   ├── basic/               # Basic examples
-│   └── document/            # Document processing
+│   ├── zh/                  # Chinese docs
+│   ├── en/                  # English docs
+│   ├── ai-context/          # AI collaboration context
+│   └── development/         # Development docs
+├── .github/workflows/       # CI/CD configuration
 ├── assets/                  # Resources
-│   ├── test_images/         # Test images
-│   └── outputs/             # Output directory
-├── README.md                # Chinese README (main)
-├── README_en.md             # English README (this file)
-├── requirements.txt         # Dependencies
-└── LICENSE                  # License
+├── pyproject.toml           # Project configuration
+├── CHANGELOG.md             # Changelog
+└── CONTRIBUTING.md          # Contributing guide
 ```
 
 ---

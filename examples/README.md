@@ -2,13 +2,23 @@
 
 本目录包含 PaddleOCR 的各种使用示例。
 
+> ⚠️ **注意**: PaddleOCR 3.x 在 macOS ARM 上可能占用大量内存（40GB+），请参阅 [常见问题](../docs/zh/troubleshooting.md#q5-内存不足-oom--系统卡死)
+
 ---
 
 ## 目录结构
 
 ```
 examples/
+├── _common/                       # 公共模块 (v0.2.0 新增)
+│   ├── __init__.py                # 统一导出接口
+│   ├── exceptions.py              # 自定义异常 (OCRException 等)
+│   ├── config.py                  # 路径配置、语言常量
+│   ├── logging_config.py          # 日志系统
+│   ├── utils.py                   # 工具函数 (文件操作、JSON 等)
+│   └── base.py                    # 基础类、上下文管理器
 ├── basic/                         # 基础示例 (PP-OCRv5)
+│   ├── __init__.py                # 模块导入
 │   ├── 01_simple_ocr.py           # 单图片 OCR
 │   ├── 02_batch_ocr.py            # 批量处理
 │   └── 03_multilingual.py         # 多语言识别
@@ -27,6 +37,57 @@ examples/
     ├── 08_paddleocr_vl.py         # 视觉语言 (PaddleOCR-VL)
     ├── 09_doc_translation.py      # 文档翻译 (PP-DocTranslation)
     └── 10_doc_understanding.py    # 文档理解 (DocUnderstanding)
+```
+
+---
+
+## 公共模块 (_common/)
+
+v0.2.0 新增的公共模块，提供统一的异常处理、日志系统和工具函数。
+
+### 使用方法
+
+```python
+from examples._common import (
+    # 异常类
+    OCRException,
+    OCRInitError,
+    OCRProcessError,
+    OCRFileNotFoundError,
+
+    # 日志
+    get_logger,
+    setup_logging,
+
+    # 配置
+    PATH_CONFIG,
+    SUPPORTED_LANGUAGES,
+
+    # 工具函数
+    ensure_directory,
+    find_images,
+    save_json,
+    format_ocr_result,
+)
+
+# 初始化日志
+setup_logging()
+logger = get_logger(__name__)
+
+# 使用路径配置
+print(PATH_CONFIG.project_root)
+print(PATH_CONFIG.test_images_dir)
+```
+
+### 异常层次结构
+
+```
+OCRException (基类)
+├── OCRInitError (E1xx)      # 初始化错误
+├── OCRProcessError (E2xx)   # 处理错误
+├── OCRFileNotFoundError (E3xx)  # 文件未找到
+├── OCROutputError (E4xx)    # 输出错误
+└── OCRConfigError (E5xx)    # 配置错误
 ```
 
 ---

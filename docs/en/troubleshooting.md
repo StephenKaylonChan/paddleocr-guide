@@ -92,7 +92,7 @@ ocr = PaddleOCR(
 )
 ```
 
-### Q5: Out of Memory (OOM)
+### Q5: Out of Memory (OOM) / System Freeze
 
 **Symptoms**:
 
@@ -100,16 +100,48 @@ ocr = PaddleOCR(
 MemoryError
 ```
 
-Or process killed by system
+Or process killed by system, or complete system freeze
 
-**Solution**:
+**⚠️ Known Serious Issue (Under Investigation)**:
+
+PaddleOCR 3.x may consume **40GB+ memory** on macOS ARM, even with small images.
+
+**Possible Causes**:
+1. PaddleOCR 3.x loads multiple preprocessing models simultaneously
+2. PaddlePaddle framework memory management issues
+3. macOS ARM platform compatibility issues
+
+**Temporary Solutions**:
 
 ```python
+# Method 1: Disable preprocessing models
+ocr = PaddleOCR(
+    lang='ch',
+    use_doc_orientation_classify=False,  # Disable document orientation
+    use_doc_unwarping=False,             # Disable document unwarping
+    use_textline_orientation=False,      # Disable textline orientation
+)
+
+# Method 2: Reduce input size
 ocr = PaddleOCR(
     lang='ch',
     det_limit_side_len=640,  # Reduce max side length (default 960)
     rec_batch_num=1          # Reduce batch size
 )
+
+# Method 3: Use lightweight model (to be verified)
+# Try PP-OCRv5_mobile instead of PP-OCRv5_server
+```
+
+**Using CLI Tool Protection**:
+
+```bash
+# CLI automatically checks image size to prevent system freeze
+paddleocr-guide scan large_image.png
+# Error: File too large: 19.4MB (limit: 10MB)
+
+# Force processing (at your own risk)
+paddleocr-guide scan large_image.png --force
 ```
 
 ### Q6: Empty Recognition Results

@@ -9,7 +9,37 @@ All notable changes to this project are documented in this file. The format is b
 
 ---
 
-## [0.2.0] - 2024-12-31
+## [0.2.1] - 2025-12-31
+
+### 新增 | Added
+
+#### CLI 命令行工具
+- 新增 `paddleocr_guide/` 模块
+- 新增 5 个 CLI 命令：
+  - `paddleocr-guide scan` - 识别单张图片
+  - `paddleocr-guide batch` - 批量处理目录
+  - `paddleocr-guide pdf` - PDF 转 Markdown
+  - `paddleocr-guide langs` - 查看支持的语言
+  - `paddleocr-guide info` - 查看环境信息
+- CLI 内置图片大小检查（限制 10MB / 1600万像素）
+
+#### 代码质量
+- 新增 `.pre-commit-config.yaml` (black, isort, pre-commit-hooks)
+- README 添加 CI/pre-commit/black 徽章
+
+### 修复 | Fixed
+- 修复 Python 3.12 动态导入 dataclass 兼容性问题
+- 修复 `format_ocr_result` 处理 None 输入
+- 修复 `normalize_language` 大小写敏感问题
+
+### 文档 | Documentation
+- 记录 PaddleOCR 内存占用过高问题 (macOS ARM 40GB+)
+- 更新 troubleshooting.md 添加内存问题解决方案
+- 更新所有 README 添加 CLI 和内存警告
+
+---
+
+## [0.2.0] - 2025-12-31
 
 ### 新增 | Added
 
