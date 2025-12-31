@@ -49,7 +49,11 @@ dependencies = [
     "paddlepaddle>=3.0.0",
     "Pillow>=9.0.0",
     "numpy>=1.20.0",
+    "click>=8.0.0",
 ]
+
+[project.scripts]
+paddleocr-guide = "paddleocr_guide.cli:main"
 
 [project.optional-dependencies]
 dev = [
@@ -87,7 +91,7 @@ Changelog = "https://github.com/stephenkaylonchan/paddleocr-guide/blob/main/CHAN
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["examples*"]
+include = ["examples*", "paddleocr_guide*"]
 exclude = ["tests*", "docs*", ".github*"]
 
 [tool.setuptools.package-data]
