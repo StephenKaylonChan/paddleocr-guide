@@ -6,7 +6,7 @@
 [![PaddleOCR](https://img.shields.io/badge/PaddleOCR-3.x-green.svg)](https://github.com/PaddlePaddle/PaddleOCR)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[English](README.md) | 中文
+[English](README_en.md) | **中文**
 
 **GitHub**: [stephenkaylonchan/paddleocr-guide](https://github.com/stephenkaylonchan/paddleocr-guide)
 
