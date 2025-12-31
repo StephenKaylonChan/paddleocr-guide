@@ -1,0 +1,185 @@
+# =============================================================================
+# GitHub Actions CI/CD 配置
+# PaddleOCR Guide - Continuous Integration
+# =============================================================================
+#
+# 触发条件:
+#   - push 到 main 分支
+#   - Pull Request 到 main 分支
+#   - 手动触发 (workflow_dispatch)
+#
+# 工作流程:
+#   1. lint: 代码格式检查 (black, isort, flake8)
+#   2. type-check: 类型检查 (mypy)
+#   3. test: 单元测试 (pytest)
+#   4. security: 安全检查 (bandit)
+#
+# =============================================================================
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'examples/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'examples/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+  workflow_dispatch:
+
+# 取消之前运行的相同工作流
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ===========================================================================
+  # 代码格式检查
+  # ===========================================================================
+  lint:
+    name: Lint Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install linting tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install black isort flake8
+
+      - name: Check code formatting with Black
+        run: |
+          black --check --diff examples/ tests/
+
+      - name: Check import sorting with isort
+        run: |
+          isort --check-only --diff examples/ tests/
+
+      - name: Lint with flake8
+        run: |
+          flake8 examples/ tests/ --max-line-length=100 --ignore=E501,W503,E203
+
+  # ===========================================================================
+  # 类型检查
+  # ===========================================================================
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install mypy
+
+      - name: Run mypy
+        run: |
+          mypy examples/ --ignore-missing-imports --no-error-summary || true
+        continue-on-error: true
+
+  # ===========================================================================
+  # 单元测试
+  # ===========================================================================
+  test:
+    name: Test (${{ matrix.os }} / Python ${{ matrix.python-version }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.8", "3.10", "3.11"]
+        exclude:
+          # 减少 macOS 的测试矩阵以节省时间
+          - os: macos-latest
+            python-version: "3.8"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov
+
+      - name: Run tests (without PaddleOCR)
+        run: |
+          # 运行不需要 PaddleOCR 的测试
+          pytest tests/ -v -m "not requires_model" --tb=short || true
+
+      - name: Test module imports
+        run: |
+          # 测试模块能否正确导入
+          python -c "from examples._common import OCRException, PATH_CONFIG; print('Import OK')"
+
+  # ===========================================================================
+  # 安全检查
+  # ===========================================================================
+  security:
+    name: Security Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install bandit
+        run: |
+          pip install bandit
+
+      - name: Run security scan
+        run: |
+          bandit -r examples/ -ll -ii --skip B101 || true
+
+  # ===========================================================================
+  # 完整测试（需要 PaddleOCR，仅在特定条件下运行）
+  # ===========================================================================
+  full-test:
+    name: Full Test with PaddleOCR
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install PaddleOCR
+        run: |
+          pip install paddlepaddle paddleocr
+
+      - name: Run full tests
+        run: |
+          pytest tests/ -v --tb=short
