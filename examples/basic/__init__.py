@@ -22,16 +22,34 @@ _CURRENT_DIR = Path(__file__).parent
 
 
 def _import_module(filename: str, module_name: str):
-    """动态导入带数字前缀的模块"""
+    """
+    动态导入带数字前缀的模块
+
+    注意：Python 3.12+ 的 dataclass 装饰器需要模块在 sys.modules 中
+    正确注册，因此我们需要在 exec_module 之前设置模块。
+
+    Args:
+        filename: 文件名 (如 "01_simple_ocr.py")
+        module_name: 模块别名 (如 "simple_ocr")
+
+    Returns:
+        导入的模块对象
+    """
+    full_module_name = f"examples.basic.{module_name}"
+
     spec = importlib.util.spec_from_file_location(
-        module_name,
+        full_module_name,  # 使用完整模块名
         _CURRENT_DIR / filename,
     )
     if spec is None or spec.loader is None:
         raise ImportError(f"无法加载模块: {filename}")
 
     module = importlib.util.module_from_spec(spec)
-    sys.modules[f"examples.basic.{module_name}"] = module
+
+    # 关键：在 exec_module 之前注册到 sys.modules
+    # 这样 dataclass 装饰器才能正确解析模块
+    sys.modules[full_module_name] = module
+
     spec.loader.exec_module(module)
     return module
 
