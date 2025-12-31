@@ -24,7 +24,9 @@ examples/
     ├── 05_handwriting_ocr.py      # 手写识别 (PP-OCRv5)
     ├── 06_vertical_text.py        # 竖排文字 (PP-OCRv5)
     ├── 07_doc_preprocessing.py    # 文档预处理 (PP-StructureV3)
-    └── 08_paddleocr_vl.py         # 视觉语言 (PaddleOCR-VL)
+    ├── 08_paddleocr_vl.py         # 视觉语言 (PaddleOCR-VL)
+    ├── 09_doc_translation.py      # 文档翻译 (PP-DocTranslation)
+    └── 10_doc_understanding.py    # 文档理解 (DocUnderstanding)
 ```
 
 ---
@@ -307,6 +309,48 @@ python examples/advanced/08_paddleocr_vl.py
 - 109 种语言支持
 - 复杂文档理解
 - 图表、公式、表格综合识别
+
+---
+
+### 09_doc_translation.py - 文档翻译
+
+**用途**: 保持版面结构的多语言翻译
+
+**适用模型**: PP-DocTranslation
+
+> ⚠️ **注意**: 需要配置 LLM API (如 ERNIE API)
+
+**运行**:
+
+```bash
+python examples/advanced/09_doc_translation.py
+```
+
+**主要功能**:
+- 识别文档版面结构
+- 保持格式进行翻译
+- 支持中英日韩等语言
+
+---
+
+### 10_doc_understanding.py - 文档理解
+
+**用途**: 深度理解文档内容，回答问题
+
+**适用模型**: DocUnderstanding (基于 VLM)
+
+> ⚠️ **注意**: 需要 VLM 模型支持，不支持 macOS ARM
+
+**运行**:
+
+```bash
+python examples/advanced/10_doc_understanding.py
+```
+
+**主要功能**:
+- 文档内容问答
+- 关键信息提取
+- 上下文理解
 
 ---
 

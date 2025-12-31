@@ -60,6 +60,8 @@
 | 竖排文字 | 竖排/纵向文字 | [06_vertical_text.py](examples/advanced/06_vertical_text.py) |
 | 文档预处理 | 方向/弯曲矫正 | [07_doc_preprocessing.py](examples/advanced/07_doc_preprocessing.py) |
 | 视觉语言 | VL 模型 (非ARM) | [08_paddleocr_vl.py](examples/advanced/08_paddleocr_vl.py) |
+| 文档翻译 | 多语言翻译 | [09_doc_translation.py](examples/advanced/09_doc_translation.py) |
+| 文档理解 | 文档问答 | [10_doc_understanding.py](examples/advanced/10_doc_understanding.py) |
 
 ---
 
@@ -134,6 +136,8 @@ PaddleOCR 3.0 提供四大核心模型：
 ```
 
 📖 详细对比：[模型选择指南](docs/zh/model_comparison.md)
+
+📖 完整 API：[API 参考文档](docs/zh/api_reference.md)
 
 ---
 
