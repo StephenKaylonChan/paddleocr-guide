@@ -92,7 +92,7 @@ ocr = PaddleOCR(
 )
 ```
 
-### Q5: 内存不足 (OOM)
+### Q5: 内存不足 (OOM) / 系统卡死
 
 **症状**:
 
@@ -100,17 +100,48 @@ ocr = PaddleOCR(
 MemoryError
 ```
 
-或进程被系统杀死
+或进程被系统杀死，或系统完全卡死
 
-**解决**:
+**⚠️ 已知严重问题 (待排查)**:
+
+PaddleOCR 3.x 在 macOS ARM 上可能占用 **40GB+ 内存**，即使是小图片也会触发。
+
+**可能原因**:
+1. PaddleOCR 3.x 同时加载多个预处理模型
+2. PaddlePaddle 框架内存管理问题
+3. macOS ARM 平台兼容性问题
+
+**临时解决方案**:
 
 ```python
+# 方法 1: 禁用预处理模型
 ocr = PaddleOCR(
-    use_angle_cls=True,
+    lang='ch',
+    use_doc_orientation_classify=False,  # 禁用文档方向分类
+    use_doc_unwarping=False,             # 禁用文档弯曲矫正
+    use_textline_orientation=False,      # 禁用文本行方向分类
+)
+
+# 方法 2: 减小输入尺寸
+ocr = PaddleOCR(
     lang='ch',
     det_limit_side_len=640,  # 减小图片最大边长（默认 960）
     rec_batch_num=1          # 减小批处理大小
 )
+
+# 方法 3: 使用轻量模型 (待验证)
+# 尝试 PP-OCRv5_mobile 而非 PP-OCRv5_server
+```
+
+**使用 CLI 工具的保护机制**:
+
+```bash
+# CLI 会自动检查图片大小，防止系统卡死
+paddleocr-guide scan large_image.png
+# 错误: 文件太大: 19.4MB (限制: 10MB)
+
+# 强制处理（风险自负）
+paddleocr-guide scan large_image.png --force
 ```
 
 ### Q6: 识别结果为空
