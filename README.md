@@ -2,9 +2,12 @@
 
 > 基于 PaddleOCR 3.0 的中文 OCR 解决方案，专为 macOS 用户优化
 
+[![CI](https://github.com/StephenKaylonChan/paddleocr-guide/actions/workflows/ci.yml/badge.svg)](https://github.com/StephenKaylonChan/paddleocr-guide/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
 [![PaddleOCR](https://img.shields.io/badge/PaddleOCR-3.x-green.svg)](https://github.com/PaddlePaddle/PaddleOCR)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 [English](README_en.md) | **中文**
 
