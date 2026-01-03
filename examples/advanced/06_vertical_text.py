@@ -185,8 +185,9 @@ class VerticalTextRecognizer:
 
             self._ocr = PaddleOCR(
                 lang=self.lang,
-                use_doc_orientation_classify=True,  # 文档方向检测
-                use_textline_orientation=True,  # 文本行方向检测
+                use_doc_orientation_classify=False,  # macOS 内存优化：禁用文档方向分类
+                use_doc_unwarping=False,             # macOS 内存优化：禁用文档弯曲矫正
+                use_textline_orientation=False,      # macOS 内存优化：禁用文本行方向分类
             )
             self._initialized = True
             logger.info("竖排文字识别引擎初始化完成")

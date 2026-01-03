@@ -81,8 +81,8 @@ class HandwritingConfig:
     text_det_thresh: float = 0.3
     text_det_box_thresh: float = 0.5
     text_rec_score_thresh: float = 0.3
-    use_textline_orientation: bool = True
-    use_doc_orientation_classify: bool = True
+    use_textline_orientation: bool = False  # macOS 内存优化：禁用文本行方向检测
+    use_doc_orientation_classify: bool = False  # macOS 内存优化：禁用文档方向分类
 
     # 预设配置
     @classmethod
@@ -267,6 +267,7 @@ class HandwritingRecognizer:
                 lang=self.lang,
                 use_textline_orientation=self.config.use_textline_orientation,
                 use_doc_orientation_classify=self.config.use_doc_orientation_classify,
+                use_doc_unwarping=False,  # macOS 内存优化：禁用文档弯曲矫正
                 text_det_thresh=self.config.text_det_thresh,
                 text_det_box_thresh=self.config.text_det_box_thresh,
                 text_rec_score_thresh=self.config.text_rec_score_thresh,

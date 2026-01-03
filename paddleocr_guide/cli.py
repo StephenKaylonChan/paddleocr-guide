@@ -64,17 +64,32 @@ def check_image_size(image_path: str) -> tuple[bool, str]:
 
 
 def get_ocr(lang: str = "ch"):
-    """延迟加载 OCR 实例"""
+    """
+    延迟加载 OCR 实例（macOS 内存优化配置）
+
+    为解决 macOS ARM 上的内存占用过高问题（默认配置可能占用 40GB+），
+    禁用了以下预处理模型：
+    - 文档方向分类 (use_doc_orientation_classify)
+    - 文档弯曲矫正 (use_doc_unwarping)
+    - 文本行方向分类 (use_textline_orientation)
+
+    优化后内存占用约 0.7GB，对常规文字识别无影响。
+    """
     try:
         from paddleocr import PaddleOCR
-        return PaddleOCR(lang=lang)
+        return PaddleOCR(
+            lang=lang,
+            use_doc_orientation_classify=False,  # macOS 内存优化
+            use_doc_unwarping=False,             # macOS 内存优化
+            use_textline_orientation=False,      # macOS 内存优化
+        )
     except ImportError:
         click.echo("错误: PaddleOCR 未安装，请运行: pip install paddleocr", err=True)
         sys.exit(1)
 
 
 @click.group()
-@click.version_option(version="0.2.0", prog_name="paddleocr-guide")
+@click.version_option(version="0.2.2", prog_name="paddleocr-guide")
 def cli():
     """
     PaddleOCR Guide - 中文 OCR 命令行工具

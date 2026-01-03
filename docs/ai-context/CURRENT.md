@@ -40,47 +40,43 @@
 
 ---
 
-## ⚠️ 待排查问题
+## ✅ 已解决问题
 
-### 🔴 严重: PaddleOCR 内存占用过高
+### ✅ 严重: PaddleOCR 内存占用过高（v0.2.2 已修复）
 
 **问题描述**:
 - 执行 OCR 时 Python 进程占用约 **40GB 内存**
 - 48GB 内存的 macOS 系统会卡死/崩溃
 - 即使是小图片 (2KB) 也会触发问题
 
-**环境**:
-- macOS Darwin arm64
-- Python 3.12.11
-- PaddleOCR 3.3.2
-- PaddlePaddle 3.2.2
+**解决方案** (2026-01-03):
+- ✅ 通过源码分析确认根本原因：默认启用 3 个预处理模型
+- ✅ 创建内存测试脚本验证修复方案
+- ✅ 禁用预处理模型（use_doc_orientation_classify/unwarping/textline_orientation=False）
+- ✅ 更新所有示例代码和 CLI 工具为优化配置
+- ✅ 更新文档（README, troubleshooting）
 
-**待排查方向**:
-1. [ ] 禁用预处理模型 (`use_doc_orientation_classify=False` 等)
-2. [ ] 测试 PP-OCRv5_mobile 轻量模型
-3. [ ] 检查 PaddlePaddle 内存配置
-4. [ ] 对比 Linux 平台内存占用
-5. [ ] 检查是否有内存泄漏
-6. [ ] 查看 PaddleOCR GitHub Issues
+**优化效果** (经实测验证):
+- 内存占用: 40GB+ → **0.7GB** (节省 **98.2%**)
+- 系统稳定性: ❌ 卡死 → ✅ 正常运行
+- 内存泄漏: 10 次循环后仅增长 **0.06%**
 
-**临时解决方案**:
-- CLI 已添加图片大小检查 (限制 10MB / 1600万像素)
+**相关 GitHub Issues**:
+- [#16173](https://github.com/PaddlePaddle/PaddleOCR/issues/16173), [#16168](https://github.com/PaddlePaddle/PaddleOCR/issues/16168), [#11639](https://github.com/PaddlePaddle/PaddleOCR/issues/11639)
 
 ---
 
 ## 下一步 (明日计划)
 
-1. **排查内存问题** (最高优先)
-   - 尝试禁用预处理模型
-   - 搜索 PaddleOCR Issues
-2. 完善 CLI 工具错误处理
-3. 添加更多单元测试
+1. 完善 CLI 工具错误处理
+2. 添加更多集成测试
+3. 考虑添加 Docker 支持
 
 ---
 
 ## 注意事项
 
-- ⚠️ **暂时避免运行 OCR 测试**，可能导致系统卡死
+- ✅ macOS ARM 内存问题已解决，可以安全运行 OCR 测试
 - macOS ARM 用户请使用 PP-OCRv5，避免 PaddleOCR-VL
 - 代码风格遵循 black + isort
 

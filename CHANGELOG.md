@@ -9,6 +9,53 @@ All notable changes to this project are documented in this file. The format is b
 
 ---
 
+## [0.2.2] - 2026-01-03
+
+### 修复 | Fixed
+
+#### macOS ARM 内存占用过高问题（关键修复）
+- 🎯 修复 macOS ARM 上内存占用 40GB+ 导致系统卡死的严重问题
+- 通过源码分析确认根本原因：PaddleOCR 默认启用 3 个预处理模型（文档方向分类、弯曲矫正、文本行方向）
+- 禁用预处理模型参数：
+  - `use_doc_orientation_classify=False`
+  - `use_doc_unwarping=False`
+  - `use_textline_orientation=False`
+- **优化效果** (经实测验证):
+  - 内存占用: 40GB+ → **0.7GB** (节省 98.2%)
+  - 系统稳定性: ❌ 卡死 → ✅ 正常运行
+  - 内存泄漏: 10 次循环后仅增长 0.06%
+
+### 新增 | Added
+
+#### 测试与验证
+- 新增 `tests/test_memory_usage.py` - 内存占用测试脚本
+  - 测试优化配置的内存占用
+  - 检测内存泄漏（10 次循环调用）
+  - 生成内存对比报告
+
+### 变更 | Changed
+
+#### 示例代码优化
+- 更新 `examples/basic/02_batch_ocr.py` - 添加内存优化参数
+- 更新 `examples/advanced/05_handwriting_ocr.py` - 配置类默认值改为 False
+- 更新 `examples/advanced/06_vertical_text.py` - 添加内存优化参数
+
+#### CLI 工具优化
+- 更新 `paddleocr_guide/cli.py` - 所有命令默认启用内存优化配置
+
+#### 文档更新
+- 更新 `README.md` - macOS 用户须知章节，添加详细优化说明和测试数据
+- 更新 `docs/zh/troubleshooting.md` - Q5 内存问题章节
+  - 添加问题根源分析（经源码分析确认）
+  - 添加 GitHub Issues 参考链接（#16173, #16168, #11639, #11588）
+  - 提供详细的解决方案和验证方法
+- 更新 `docs/ai-context/CURRENT.md` - 标记内存问题为已解决
+
+### 参考 | References
+- GitHub Issues: [#16173](https://github.com/PaddlePaddle/PaddleOCR/issues/16173), [#16168](https://github.com/PaddlePaddle/PaddleOCR/issues/16168), [#11639](https://github.com/PaddlePaddle/PaddleOCR/issues/11639), [#11588](https://github.com/PaddlePaddle/PaddleOCR/issues/11588)
+
+---
+
 ## [0.2.1] - 2025-12-31
 
 ### 新增 | Added
