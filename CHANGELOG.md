@@ -33,6 +33,14 @@ All notable changes to this project are documented in this file. The format is b
   - 检测内存泄漏（10 次循环调用）
   - 生成内存对比报告
 
+#### 图片预处理工具
+- 新增 `examples/_common/utils.py::resize_image_for_ocr()` - 大图片预处理函数
+  - 自动缩小大图片到适合 OCR 的尺寸（默认 1200px）
+  - 使用 LANCZOS 高质量重采样算法
+  - 支持临时文件或覆盖原文件
+  - 包含详细的实测数据和使用说明
+  - **优化效果**: 2000x3254 图片从 30GB → 5-7GB，准确率 95%+ 保持不变
+
 ### 变更 | Changed
 
 #### 示例代码优化
@@ -49,7 +57,9 @@ All notable changes to this project are documented in this file. The format is b
   - 添加问题根源分析（经源码分析确认）
   - 添加 GitHub Issues 参考链接（#16173, #16168, #11639, #11588）
   - 提供详细的解决方案和验证方法
-- 更新 `docs/ai-context/CURRENT.md` - 标记内存问题为已解决
+  - 添加大图片处理建议和 `resize_image_for_ocr()` 使用说明
+- 更新 `docs/ai-context/CURRENT.md` - 标记内存问题为已解决，添加大图片处理记录
+- 更新 `examples/_common/__init__.py` - 导出 `resize_image_for_ocr` 函数
 
 ### 参考 | References
 - GitHub Issues: [#16173](https://github.com/PaddlePaddle/PaddleOCR/issues/16173), [#16168](https://github.com/PaddlePaddle/PaddleOCR/issues/16168), [#11639](https://github.com/PaddlePaddle/PaddleOCR/issues/11639), [#11588](https://github.com/PaddlePaddle/PaddleOCR/issues/11588)

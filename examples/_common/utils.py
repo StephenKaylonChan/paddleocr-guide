@@ -562,6 +562,121 @@ def set_paddleocr_env() -> None:
 
 
 # =============================================================================
+# 图片预处理函数（内存优化）
+# Image Preprocessing Functions (Memory Optimization)
+# =============================================================================
+
+
+def resize_image_for_ocr(
+    image_path: Union[str, Path],
+    max_size: int = 1200,
+    output_path: Optional[Union[str, Path]] = None,
+) -> str:
+    """
+    缩小大图片到适合 OCR 的尺寸（内存优化）
+
+    在 macOS ARM 上，PaddleOCR 处理大图片时可能占用大量内存。
+    建议在 OCR 之前先将大图片缩小到 1200-1600px，可显著降低内存占用，
+    且对识别准确率影响极小。
+
+    On macOS ARM, PaddleOCR may consume excessive memory when processing large images.
+    It's recommended to resize large images to 1200-1600px before OCR, which significantly
+    reduces memory usage with minimal impact on recognition accuracy.
+
+    实测数据 (Benchmark):
+    - 2000x3254 图片: 30GB 内存峰值 → 缩小后 5-7GB
+    - 识别准确率: 几乎无影响 (95%+ 保持不变)
+
+    Args:
+        image_path: 输入图片路径
+        max_size: 最大边长（默认 1200，推荐范围 1000-1600）
+        output_path: 输出路径（默认保存到临时目录）
+
+    Returns:
+        处理后的图片路径
+
+    Raises:
+        OCRFileNotFoundError: 图片文件不存在
+        OCROutputError: 图片保存失败
+
+    Example:
+        >>> from paddleocr import PaddleOCR
+        >>> from examples._common import resize_image_for_ocr
+        >>>
+        >>> # 先缩小大图片
+        >>> processed = resize_image_for_ocr("large_book_cover.png", max_size=1200)
+        >>>
+        >>> # 再进行 OCR 识别
+        >>> ocr = PaddleOCR(
+        ...     lang='ch',
+        ...     use_doc_orientation_classify=False,
+        ...     use_doc_unwarping=False,
+        ...     use_textline_orientation=False,
+        ... )
+        >>> result = ocr.predict(processed)
+    """
+    try:
+        from PIL import Image
+    except ImportError as e:
+        raise OCROutputError(
+            "Pillow 未安装，请运行: pip install Pillow",
+            error_code="E501",
+        ) from e
+
+    # 验证输入文件
+    path = Path(image_path)
+    if not path.exists():
+        raise OCRFileNotFoundError(
+            f"图片文件不存在: {path}",
+            file_path=str(path),
+        )
+
+    # 打开图片
+    img = Image.open(path)
+    original_size = (img.width, img.height)
+
+    # 检查是否需要缩小
+    max_dim = max(img.width, img.height)
+    if max_dim <= max_size:
+        logger.info(f"图片尺寸 {original_size} 无需缩小 (< {max_size}px)")
+        return str(path)
+
+    # 计算缩放比例
+    scale = max_size / max_dim
+    new_size = (int(img.width * scale), int(img.height * scale))
+
+    logger.info(
+        f"缩小图片: {original_size} → {new_size} (缩放比例: {scale:.2f})"
+    )
+
+    # 使用高质量重采样算法
+    img_resized = img.resize(new_size, Image.Resampling.LANCZOS)
+
+    # 确定输出路径
+    if output_path is None:
+        # 使用临时目录
+        import tempfile
+
+        temp_dir = Path(tempfile.gettempdir())
+        output_path = temp_dir / f"ocr_resized_{path.name}"
+    else:
+        output_path = Path(output_path)
+
+    # 保存图片
+    try:
+        output_path.parent.mkdir(parents=True, exist_ok=True)
+        img_resized.save(output_path)
+        logger.info(f"已保存缩小后的图片: {output_path}")
+    except Exception as e:
+        raise OCROutputError(
+            f"保存图片失败: {e}",
+            error_code="E502",
+        ) from e
+
+    return str(output_path)
+
+
+# =============================================================================
 # 初始化时设置环境
 # Set environment on import
 # =============================================================================

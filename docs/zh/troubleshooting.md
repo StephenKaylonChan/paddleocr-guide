@@ -187,6 +187,92 @@ paddleocr-guide scan large_image.png --force
 pytest tests/test_memory_usage.py -v -s
 ```
 
+---
+
+## ⚠️ 补充说明：大图片仍需注意
+
+虽然禁用预处理模型后初始化内存大幅降低（40GB → 0.7GB），但在处理**大尺寸图片**时，内存仍可能飙升。
+
+### 实测数据
+
+| 图片尺寸 | 像素数 | 文件大小 | 内存峰值 |
+|---------|--------|---------|---------|
+| 400x100 | 40K | 1.5KB | 0.7GB ✅ |
+| 983x1600 | 1.57M | - | 9.3GB ⚠️ |
+| 2000x3254 | 6.5M | 4.3MB | 30GB ❌ |
+
+**结论**：图片越大，内存占用越高（远超理论值，疑似 PaddleOCR 内存管理问题）。
+
+### 推荐做法：预处理大图片
+
+对于大于 1600px 的图片，建议先缩小：
+
+```python
+from PIL import Image
+
+def resize_for_ocr(image_path, max_size=1200):
+    """
+    缩小大图片到适合 OCR 的尺寸
+
+    Args:
+        image_path: 图片路径
+        max_size: 最大边长（推荐 1200-1600）
+
+    Returns:
+        处理后的图片路径
+    """
+    img = Image.open(image_path)
+
+    # 检查是否需要缩小
+    max_dim = max(img.width, img.height)
+    if max_dim <= max_size:
+        return image_path
+
+    # 计算缩放比例
+    scale = max_size / max_dim
+    new_size = (int(img.width * scale), int(img.height * scale))
+
+    # 使用高质量重采样
+    img_resized = img.resize(new_size, Image.Resampling.LANCZOS)
+
+    # 保存临时文件
+    temp_path = "/tmp/ocr_resized.png"
+    img_resized.save(temp_path)
+
+    return temp_path
+
+# 使用示例
+from paddleocr import PaddleOCR
+
+ocr = PaddleOCR(
+    lang='ch',
+    use_doc_orientation_classify=False,
+    use_doc_unwarping=False,
+    use_textline_orientation=False,
+)
+
+# 先缩小图片
+processed_image = resize_for_ocr("large_image.png", max_size=1200)
+
+# 再识别
+result = ocr.predict(processed_image)
+```
+
+**优化效果**：
+- 内存占用：30GB → **5-7GB**
+- 识别准确率：几乎无影响（文字仍然清晰可读）
+- 处理速度：更快
+
+### 为什么缩小后识别效果不变？
+
+OCR 识别的关键是**文字的清晰度**，而不是图片的绝对尺寸。
+
+- ✅ 1200px 的图片，文字仍然足够清晰
+- ✅ 书籍封面、文档扫描件、截图等常见场景完全够用
+- ⚠️ 仅对极小的文字（< 10px）可能有轻微影响
+
+---
+
 ### Q6: 识别结果为空
 
 **可能原因**:

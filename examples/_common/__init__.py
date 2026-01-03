@@ -116,6 +116,7 @@ from .utils import (  # 文件操作; JSON 操作; 文本处理; 时间和统计
     get_timestamp,
     join_texts,
     load_json,
+    resize_image_for_ocr,
     save_json,
     set_paddleocr_env,
     validate_file_exists,
@@ -285,6 +286,7 @@ __all__ = [
     "create_summary_report",
     "get_env_or_default",
     "set_paddleocr_env",
+    "resize_image_for_ocr",
     # 便捷函数
     "quick_ocr",
     "check_platform",
