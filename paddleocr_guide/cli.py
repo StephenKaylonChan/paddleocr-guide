@@ -89,7 +89,7 @@ def get_ocr(lang: str = "ch"):
 
 
 @click.group()
-@click.version_option(version="0.2.2", prog_name="paddleocr-guide")
+@click.version_option(version="0.3.0", prog_name="paddleocr-guide")
 def cli():
     """
     PaddleOCR Guide - 中文 OCR 命令行工具
@@ -136,6 +136,9 @@ def scan(image: str, lang: str, output: Optional[str], as_json: bool, force: boo
     texts = []
     for res in result:
         data = res.json
+        # PaddleOCR 3.x 数据嵌套在 'res' 键下
+        if "res" in data:
+            data = data["res"]
         if "rec_texts" in data:
             for text, score in zip(data["rec_texts"], data["rec_scores"]):
                 texts.append({"text": text, "confidence": float(score)})
@@ -198,6 +201,9 @@ def batch(directory: str, lang: str, output: Optional[str], fmt: str):
                 texts = []
                 for res in result:
                     data = res.json
+                    # PaddleOCR 3.x 数据嵌套在 'res' 键下
+                    if "res" in data:
+                        data = data["res"]
                     if "rec_texts" in data:
                         for text, score in zip(data["rec_texts"], data["rec_scores"]):
                             texts.append({"text": text, "confidence": float(score)})
