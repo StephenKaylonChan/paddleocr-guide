@@ -23,6 +23,7 @@
 - [使用示例](#使用示例)
 - [macOS 用户须知](#macos-用户须知)
 - [常见问题](#常见问题)
+- [完整文档](#完整文档)
 - [项目结构](#项目结构)
 - [贡献指南](#贡献指南)
 
@@ -334,9 +335,9 @@ paddleocr-guide/
 │   ├── test_common.py       # 公共模块测试
 │   └── test_basic_ocr.py    # OCR 测试
 ├── docs/                    # 文档
-│   ├── zh/                  # 中文文档
-│   ├── en/                  # 英文文档
+│   ├── zh/                  # 中文文档 (17 个文档)
 │   ├── ai-context/          # AI 协作上下文
+│   │   └── guides/          # AI 配置指南
 │   └── development/         # 开发文档
 ├── .github/workflows/       # CI/CD 配置
 ├── assets/                  # 资源文件
