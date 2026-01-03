@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "paddleocr-guide"
-version = "0.2.2"
+version = "0.3.0"
 description = "PaddleOCR 3.x 实战指南 - 中文 OCR 最佳实践 | PaddleOCR 3.x Guide - Chinese OCR Best Practices"
 readme = "README.md"
 license = {text = "MIT"}

@@ -9,8 +9,6 @@
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-[English](README_en.md) | **中文**
-
 **GitHub**: [stephenkaylonchan/paddleocr-guide](https://github.com/stephenkaylonchan/paddleocr-guide)
 
 ---
@@ -32,7 +30,7 @@
 
 ## 项目简介
 
-本项目提供 PaddleOCR 3.0 的实战示例和最佳实践，帮助开发者快速上手中文 OCR（光学字符识别）。
+本项目是面向**中文社区**的 PaddleOCR 3.0 实战指南，提供完整的示例代码和最佳实践，帮助开发者快速上手中文 OCR（光学字符识别）。
 
 **为什么选择 PaddleOCR？**
 

@@ -1,8 +1,8 @@
 # 项目上下文（AI 快速恢复）
 
-**最后更新**: 2025-12-31
-**项目阶段**: Beta (0.2.1)
-**当前状态**: 功能完整
+**最后更新**: 2026-01-03
+**项目阶段**: Beta (0.3.0)
+**当前状态**: 文档体系完善
 
 ---
 
@@ -13,7 +13,7 @@
 | **项目名称** | paddleocr-guide |
 | **项目性质** | PaddleOCR 3.0 中文实战指南 |
 | **技术栈** | Python 3.8+ / PaddleOCR 3.x / PaddlePaddle |
-| **核心特点** | 中英双语 / macOS 优化 / CLI 工具 |
+| **核心特点** | 中文社区 / macOS 优化 / CLI 工具 |
 | **仓库地址** | [StephenKaylonChan/paddleocr-guide](https://github.com/StephenKaylonChan/paddleocr-guide) |
 
 ---
@@ -42,20 +42,29 @@
 
 ### ✅ 已完成
 - 项目初始化（pyproject.toml, .gitignore, LICENSE）
-- 中英文 README
+- 中文 README（面向中文社区）
 - **16 个示例代码** (basic/3, document/3, advanced/10)
 - **公共模块** (examples/_common/)
-- 中英文文档（docs/zh/, docs/en/）
+- **完整文档体系** (docs/zh/, 17 个文档)
+  - 核心文档（installation, api_reference, model_comparison, troubleshooting）
+  - **新增 7 个文档** (v0.3.0):
+    - quickstart.md (快速入门)
+    - performance.md (性能优化)
+    - case_studies.md (实际案例)
+    - best_practices.md (最佳实践)
+    - error_codes.md (错误代码)
+    - deployment.md (部署指南)
+    - README.md (文档导航)
 - **测试框架** (tests/, 27个用例)
 - **CI/CD** (GitHub Actions)
-- **CLI 命令行工具** (paddleocr-guide)
+- **CLI 命令行工具** (paddleocr-guide, 5个命令)
 - **pre-commit hooks**
 - GitHub 仓库
 
 ### 📋 待开发
-- 排查内存问题（优先）
 - 更多集成测试
-- Docker 支持
+- Web UI（可选）
+- 视频教程（可选）
 
 ---
 
@@ -73,9 +82,9 @@ paddleocr-guide/
 ├── tests/                  # 测试代码
 ├── docs/
 │   ├── ai-context/         # AI 记忆层
+│   │   └── guides/         # AI 配置指南
 │   ├── development/        # 开发文档
-│   ├── zh/                 # 中文文档
-│   └── en/                 # 英文文档
+│   └── zh/                 # 中文文档
 ├── .github/workflows/      # CI/CD
 └── assets/                 # 资源文件
 ```

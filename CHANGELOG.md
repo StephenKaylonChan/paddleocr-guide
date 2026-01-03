@@ -9,6 +9,91 @@ All notable changes to this project are documented in this file. The format is b
 
 ---
 
+## [0.3.0] - 2026-01-03
+
+### 重大变更 | Breaking Changes
+
+#### 项目定位调整
+- 项目正式定位为**面向中文社区的开源项目**
+- 删除所有英文文档（docs/en/, README_en.md）
+- 代码中保留双语 docstring（符合开源最佳实践）
+
+#### 目录结构重组
+- 删除 `docs/en/` 整个目录（4 个文件，1839 行）
+- 移动 `docs/guides/` → `docs/ai-context/guides/`（4 个文件）
+- `docs/zh/` 成为唯一的文档中心
+
+### 新增 | Added
+
+#### 核心文档（7 个新文档，2500+ 行）
+- **docs/zh/README.md** - 文档导航索引
+  - 快速导航系统（新手/核心/进阶/参考）
+  - 3 条学习路径（快速上手/深入理解/生产部署）
+  - 按场景查找（8 个常见场景）
+  - Top 5 文档和问题解决
+- **docs/zh/quickstart.md** - 快速入门教程
+  - 5 分钟快速上手指南
+  - 3 个核心场景（单张识别/批量处理/PDF 转换）
+  - 5 个常见问题快速解答
+  - 完整代码示例（可直接运行）
+- **docs/zh/performance.md** - 性能优化专题
+  - macOS ARM 内存优化（40GB → 0.7GB）
+  - 大图片处理策略
+  - GPU 加速配置
+  - 批处理优化方案
+  - 完整的性能基准测试
+- **docs/zh/case_studies.md** - 实际案例集
+  - 增值税发票识别系统（完整代码 + 性能数据）
+  - 身份证信息提取（包含校验和脱敏）
+  - PDF 电子书转 Markdown
+  - 批量处理 10000 张扫描件
+- **docs/zh/best_practices.md** - 最佳实践汇总
+  - 代码组织（上下文管理器/异常处理/日志/类型提示）
+  - 性能最佳实践（内存/速度优化）
+  - 准确率优化方案
+  - 生产环境建议（错误处理/监控/缓存）
+- **docs/zh/error_codes.md** - 错误代码手册
+  - 完整的错误代码体系（E1xx - E6xx）
+  - 每个错误代码的详细说明和解决方案
+  - 异常处理最佳实践
+  - 常见错误快速查询表
+- **docs/zh/deployment.md** - 部署指南
+  - Docker 部署（基础 + 优化 + GPU 支持）
+  - Docker Compose 配置
+  - FastAPI 生产级 API 服务
+  - Nginx 反向代理配置
+  - 云平台部署（阿里云/腾讯云/AWS）
+  - 监控和运维（健康检查/日志/告警）
+
+### 变更 | Changed
+
+#### 文档更新
+- **README.md**: 删除英文链接，添加"面向中文社区"说明
+- **docs/ai-context/CONTEXT.md**: 更新项目定位和文档路径
+- **docs/ai-context/CURRENT.md**: 记录 v0.3.0 重构进展
+
+### 文件统计 | File Statistics
+
+- **删除**: 5 个文件（1839 行）
+  - `docs/en/installation.md` (255 行)
+  - `docs/en/api_reference.md` (534 行)
+  - `docs/en/model_comparison.md` (262 行)
+  - `docs/en/troubleshooting.md` (467 行)
+  - `README_en.md` (321 行)
+- **移动**: 4 个文件（保留 git 历史）
+  - `docs/guides/` → `docs/ai-context/guides/`
+- **新增**: 7 个文档（2500+ 行）
+- **修改**: 5+ 个文件
+
+### 文档体系对比
+
+| 版本 | 文档数量 | 总行数 | 中英双语 | 学习路径 | 实际案例 |
+|------|---------|-------|---------|---------|---------|
+| v0.2.2 | 10 个 | ~3000 | 是 | 无 | 0 |
+| **v0.3.0** | **17 个** | **~5500** | **否（纯中文）** | **3 条** | **4 个** |
+
+---
+
 ## [0.2.2] - 2026-01-03
 
 ### 修复 | Fixed
