@@ -318,6 +318,40 @@ A: `lang='ch'` 默认支持中英文混合。纯英文可用 `lang='en'`。
 
 ---
 
+## 完整文档
+
+本项目提供 **17 个完整的中文文档**，覆盖从快速入门到生产部署的全流程。
+
+### 文档导航中心
+
+📚 **[文档导航索引](docs/zh/README.md)** - 所有文档的中心入口，提供学习路径和场景化搜索
+
+### 新手入门
+
+- [快速入门教程](docs/zh/quickstart.md) - 5 分钟上手 PaddleOCR ⭐
+- [安装指南](docs/zh/installation.md) - 环境配置和依赖安装
+
+### 核心文档
+
+- [API 参考](docs/zh/api_reference.md) - 完整的 API 文档和参数说明
+- [模型对比](docs/zh/model_comparison.md) - 选择最适合的 PaddleOCR 模型
+- [故障排查](docs/zh/troubleshooting.md) - 常见问题和解决方案
+
+### 进阶指南
+
+- [性能优化专题](docs/zh/performance.md) - 内存、速度、准确率全方位优化 ⭐
+- [最佳实践](docs/zh/best_practices.md) - 代码规范和设计模式 ⭐
+- [实际案例集](docs/zh/case_studies.md) - 4 个真实应用场景 ⭐
+
+### 参考手册
+
+- [错误代码手册](docs/zh/error_codes.md) - E1xx-E6xx 错误代码详解
+- [部署指南](docs/zh/deployment.md) - Docker 和生产环境部署
+
+> **v0.3.0 新增**: 7 个核心文档（2500+ 行），全面覆盖实战需求
+
+---
+
 ## 项目结构
 
 ```
