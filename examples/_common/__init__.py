@@ -46,7 +46,7 @@ from __future__ import annotations
 # Version Information
 # =============================================================================
 
-__version__ = "0.2.0"
+__version__ = "0.2.2"
 __author__ = "paddleocr-guide"
 
 
